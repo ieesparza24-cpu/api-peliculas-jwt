@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+
 const sequelize = require('./modules/db');
 
 const peliculasRouter = require('./routes/Peliculas');
@@ -12,13 +13,18 @@ const app = express();
 
 app.use(express.json());
 app.use(morgan('dev'));
+
 app.use(validarApiKey);
 
 app.use('/', authRouter);
 app.use('/peliculas', validarToken, peliculasRouter);
 
+const PORT = process.env.PORT || 3001;
+
 sequelize.sync().then(() => {
-  app.listen(3000, () => {
-    console.log('API corriendo en http://localhost:3000');
+  app.listen(PORT, () => {
+    console.log(`API corriendo en puerto ${PORT}`);
   });
+}).catch((error) => {
+  console.error('Error al conectar la base de datos:', error);
 });
